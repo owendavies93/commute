@@ -36,6 +36,19 @@ post '/commutes/start' => sub {
     return $c->render(json => { message => ($status ? 'Started' : 'Failed') });
 };
 
+post '/commutes/intermediate' => sub {
+    my $c = shift;
+
+    my $status = $c->db->do(q(
+        UPDATE commutes SET
+        intermediate_timestamp = NOW(),
+        intermediate_time = TIMESTAMPDIFF(SECOND, start_time, NOW())
+        WHERE end_time IS NULL
+        ORDER BY id DESC LIMIT 1
+    ), undef);
+    return $c->render(json => { message => ($status ? 'Added' : 'Failed') });
+};
+
 post '/commutes/end' => sub {
     my $c = shift;
     my $mpg = $c->param('mpg');

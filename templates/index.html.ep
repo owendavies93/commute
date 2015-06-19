@@ -10,6 +10,8 @@
     <h2>Enjoy the drive!</h2>
     <div><a class="btn btn-lg btn-success" id="start_button">Start Commute</a><p class="start-status"></p></div>
     <hr/>
+    <div><a class="btn btn-lg btn-primary" id="lap_button">Add Intermediate Time</a><p class="lap-status"></p></div>
+    <hr/>
     <div>
         <div class="form-group">
             <input type="text" class="form-control input-lg" id="mpg" placeholder="MPG" />
@@ -28,6 +30,11 @@ $(document).ready(function() {
     $('#start_button').on('click', function() {
         $.post('commutes/start').done(function() { $('.start-status').text("Go go go!"); })
                                 .fail(function() { $('.start-status').text("Couldn't start!"); });
+    });
+
+    $('#lap_button').on('click', function() {
+        $.post('commutes/intermediate').done(function() { $('.lap-status').text("Added!"); })
+                                       .fail(function() { $('.lap-status').text("Couldn't add!"); });
     });
 
     $('#end_button').on('click', function() {
