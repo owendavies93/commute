@@ -1,4 +1,5 @@
 use Mojolicious::Lite;
+use Time::Piece;
 
 plugin 'basic_auth';
 plugin 'database', {
@@ -31,8 +32,12 @@ get '/commutes/all' => sub {
 post '/commutes/start' => sub {
     my $c = shift;
 
-    my $status = $c->db->do(
-        'INSERT INTO commutes (start_time) VALUES (CURRENT_TIMESTAMP)');
+    my $hour   = localtime->[2];
+    my $dir    = int($hour) <= 12 ? 'in' : 'out';
+    my $status = $c->db->do(q(
+        INSERT INTO commutes (start_time, direction)
+        VALUES (CURRENT_TIMESTAMP, ?)
+    ), undef, $dir);
     return $c->render(json => { message => ($status ? 'Started' : 'Failed') });
 };
 
