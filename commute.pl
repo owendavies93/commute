@@ -13,7 +13,7 @@ under sub {
         realm => sub { return 1 if "@_" eq "odavies testing123" }
     );
     return 1 if $access;
-    $c->render(template => 'nope');
+    $c->render(text => 'Nope');
     return undef;
 };
 
@@ -52,10 +52,3 @@ post '/commutes/end' => sub {
 app->secrets(['commutes rock']);
 app->start;
 
-__DATA__
-
-@@ index.html.ep
-I'm doing regression analysis on my commute!
-
-@@ nope.html.ep
-Nope.

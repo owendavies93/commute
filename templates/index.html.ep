@@ -1,0 +1,43 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start and End a commute</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+<div class="container text-center" style="max-width:400px">
+    <h2>Enjoy the drive!</h2>
+    <div><a class="btn btn-lg btn-success" id="start_button">Start Commute</a><p class="start-status"></p></div>
+    <hr/>
+    <div>
+        <div class="form-group">
+            <input type="text" class="form-control input-lg" id="mpg" placeholder="MPG" />
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control input-lg" id="length" placeholder="Journey Distance (miles)" />
+        </div>
+        <a class="btn btn-lg btn-danger" id="end_button">End Commute</a>
+        <p class="end-status"></p>
+    </div>
+</div>
+</body>
+
+<script>
+$(document).ready(function() {
+    $('#start_button').on('click', function() {
+        $.post('commutes/start').done(function() { $('.start-status').text("Go go go!"); })
+                                .fail(function() { $('.start-status').text("Couldn't start!"); });
+    });
+
+    $('#end_button').on('click', function() {
+        $.post('commutes/end', {
+            mpg: $("#mpg").val(),
+            length: $("#length").val(),
+        }).done(function() { $('.end-status').text("Ended"); })
+          .fail(function() { $('.end-status').text("Couldn't end it!"); });
+    });
+});
+</script>
+
+</html>
