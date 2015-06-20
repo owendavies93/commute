@@ -64,7 +64,33 @@ post '/commutes/end' => sub {
         total_time = TIMESTAMPDIFF(SECOND, start_time, NOW())
         ORDER BY id DESC LIMIT 1
     ), undef, $mpg, $len);
-    return $c->render(json => { message => ($status ? 'Ended' : 'Failed') });
+    my ($commute_id) = $c->db->selectrow_array('SELECT MAX(id) FROM commutes');
+    return $c->render(json => {
+        message => ($status ? 'Ended' : 'Failed'),
+        commute => $commute_id,
+    });
+};
+
+get '/fuel_stops' => sub { shift->redirect_to('/commute/fuel_stops/all') };
+
+get '/fuel_stops/all' => sub {
+    my $c = shift;
+    my $res = $c->db->selectall_arrayref(
+        'SELECT * FROM fuel_stops', { Slice => {} });
+    $c->render(json => $res);
+};
+
+post '/fuel_stops/new' => sub {
+    my $c = shift;
+    my $c_id = $c->param('commute_id');
+    my $cost = $c->param('cost');
+
+    my $status = $c->db->do(q(
+        INSERT INTO fuel_stops (cost, date, commute_id)
+        VALUES (?, NOW(), ?)
+    ), undef, $cost, $c_id);
+    my $msg = $status ? 'Added Fuel Stop' : 'Failed to add Fuel Stop';
+    return $c->render(json => { message => $msg });
 };
 
 app->secrets(['commutes rock']);
