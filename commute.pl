@@ -1,17 +1,27 @@
 use Mojolicious::Lite;
 use Time::Piece;
+use Readonly;
 
+Readonly my $CONFIG => '/etc/commute/commute.yaml';
+
+my $config = plugin 'yaml_config', {
+    file  => $CONFIG,
+    class => 'YAML::XS',
+};
 plugin 'basic_auth';
 plugin 'database', {
     dsn      => 'dbi:mysql:commute:',
-    username => 'odavies',
-    password => 'testing123',
+    username => $config->{database}->{username},
+    password => $config->{database}->{password},
 };
 
 under sub {
     my $c = shift;
+
+    my $u = $config->{auth}->{username};
+    my $p = $config->{auth}->{password};
     my $access = $c->basic_auth(
-        realm => sub { return 1 if "@_" eq "odavies testing123" }
+        realm => sub { return 1 if "@_" eq "$u $p" }
     );
     return 1 if $access;
     $c->render(text => 'Nope');
