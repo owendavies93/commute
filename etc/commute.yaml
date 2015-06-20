@@ -1,0 +1,8 @@
+auth:
+    username: owen
+    password: jibbletastic
+
+database:
+    username: owen
+    password: jibbletastic
+    host: localhost
