@@ -1,4 +1,5 @@
 use Mojolicious::Lite;
+use DBI;
 use Time::Piece;
 use Readonly;
 
@@ -9,11 +10,16 @@ my $config = plugin 'yaml_config', {
     class => 'YAML::XS',
 };
 plugin 'basic_auth';
-plugin 'database', {
-    dsn      => 'dbi:mysql:commute:',
-    username => $config->{database}->{username},
-    password => $config->{database}->{password},
-};
+
+app->attr(dbh => sub {
+    my $c = shift;
+    return DBI->connect(
+        'dbi:mysql:commute:', 
+        $config->{database}->{username}, 
+        $config->{database}->{password},
+        {RaiseError => 1, AutoCommit => 1, mysql_auto_reconnect => 1}
+    );
+});
 
 under sub {
     my $c = shift;
@@ -34,7 +40,7 @@ get '/commutes' => sub { shift->redirect_to('/commute/commutes/all') };
 
 get '/commutes/all' => sub {
     my $c = shift;
-    my $res = $c->db->selectall_arrayref(
+    my $res = $c->app->dbh->selectall_arrayref(
         'SELECT * FROM commutes', { Slice => {} });
     $c->render(json => $res);
 };
@@ -44,7 +50,7 @@ post '/commutes/start' => sub {
 
     my $hour   = localtime->[2];
     my $dir    = int($hour) <= 12 ? 'in' : 'out';
-    my $status = $c->db->do(q(
+    my $status = $c->app->dbh->do(q(
         INSERT INTO commutes (start_time, direction)
         VALUES (CURRENT_TIMESTAMP, ?)
     ), undef, $dir);
@@ -54,7 +60,7 @@ post '/commutes/start' => sub {
 post '/commutes/intermediate' => sub {
     my $c = shift;
 
-    my $status = $c->db->do(q(
+    my $status = $c->app->dbh->do(q(
         UPDATE commutes SET
         intermediate_timestamp = NOW(),
         intermediate_time = TIMESTAMPDIFF(SECOND, start_time, NOW())
@@ -69,12 +75,12 @@ post '/commutes/end' => sub {
     my $mpg = $c->param('mpg');
     my $len = $c->param('length');
 
-    my $status = $c->db->do(q(
+    my $status = $c->app->dbh->do(q(
         UPDATE commutes SET end_time = NOW(), mpg = ?, length = ?,
         total_time = TIMESTAMPDIFF(SECOND, start_time, NOW())
         ORDER BY id DESC LIMIT 1
     ), undef, $mpg, $len);
-    my ($commute_id) = $c->db->selectrow_array('SELECT MAX(id) FROM commutes');
+    my ($commute_id) = $c->app->dbh->selectrow_array('SELECT MAX(id) FROM commutes');
     return $c->render(json => {
         message => ($status ? 'Ended' : 'Failed'),
         commute => $commute_id,
@@ -85,7 +91,7 @@ get '/fuel_stops' => sub { shift->redirect_to('/commute/fuel_stops/all') };
 
 get '/fuel_stops/all' => sub {
     my $c = shift;
-    my $res = $c->db->selectall_arrayref(
+    my $res = $c->app->dbh->selectall_arrayref(
         'SELECT * FROM fuel_stops', { Slice => {} });
     $c->render(json => $res);
 };
@@ -95,7 +101,7 @@ post '/fuel_stops/new' => sub {
     my $c_id = $c->param('commute_id');
     my $cost = $c->param('cost');
 
-    my $status = $c->db->do(q(
+    my $status = $c->app->dbh->do(q(
         INSERT INTO fuel_stops (cost, date, commute_id)
         VALUES (?, NOW(), ?)
     ), undef, $cost, $c_id);
@@ -103,6 +109,7 @@ post '/fuel_stops/new' => sub {
     return $c->render(json => { message => $msg });
 };
 
+app->config(hypnotoad => { listen => ['http://*:3000'] });
 app->secrets(['commutes rock']);
 app->start;
 
