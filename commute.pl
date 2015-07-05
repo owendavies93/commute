@@ -119,6 +119,29 @@ post '/fuel_stops/new' => sub {
     return $c->render(json => { message => $msg });
 };
 
+post '/routes/new' => sub {
+    my $c = shift;
+    my $name  = $c->param('name');
+    my $t_len = $c->param('length');
+    my $i_len = $c->param('intermediate_length');
+
+    return $c->render(json => { message => 'Intermediate needs to be less than total' })
+        if !defined $i_len || !defined $t_len || $t_len <= $i_len;
+
+    # Insert supplied values in the 'in' direction, then reverse for 'out'
+    my $status1 = $c->app->dbh->do(q(
+        INSERT INTO routes (name, direction, length, intermediate_length)
+        VALUES (?, 'in', ?, ?)
+    ), undef, $name, $t_len, $i_len);
+    my $status2 = $c->app->dbh->do(q(
+        INSERT INTO routes (name, direction, length, intermediate_length)
+        VALUES (?, 'out', ?, ?)
+    ), undef, $name, $t_len, $t_len - $i_len);
+
+    my $msg = ($status1 && $status2) ? 'Added' : 'Failed';
+    return $c->render(json => { message => $msg });
+};
+
 app->config(hypnotoad => { listen => ['http://*:3000'] });
 app->secrets(['commutes rock']);
 app->start;
