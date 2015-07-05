@@ -48,8 +48,10 @@ get '/commutes/all' => sub {
 post '/commutes/start' => sub {
     my $c = shift;
 
-    my $hour   = localtime->[2];
-    my $dir    = int($hour) <= 12 ? 'in' : 'out';
+    my $hour = localtime->[2];
+    my $dir  = $c->param('direction');
+    $dir //= (int($hour) <= 12 ? 'in' : 'out');
+    
     my $status = $c->app->dbh->do(q(
         INSERT INTO commutes (start_time, direction)
         VALUES (CURRENT_TIMESTAMP, ?)
