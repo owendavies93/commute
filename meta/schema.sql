@@ -28,13 +28,13 @@ CREATE TABLE `commutes` (
   `end_time` timestamp NULL DEFAULT NULL,
   `total_time` int(11) DEFAULT NULL,
   `mpg` decimal(5,1) DEFAULT NULL,
-  `length` decimal(5,1) DEFAULT NULL,
   `intermediate_timestamp` timestamp NULL DEFAULT NULL,
   `intermediate_time` int(11) DEFAULT NULL,
   `direction` enum('in','out') DEFAULT NULL,
+  `route_id` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `direction` (`direction`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -50,7 +50,25 @@ CREATE TABLE `fuel_stops` (
   `cost` decimal(5,2) DEFAULT NULL,
   `commute_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `routes`
+--
+
+DROP TABLE IF EXISTS `routes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `routes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `length` decimal(5,1) NOT NULL,
+  `intermediate_length` decimal(5,1) NOT NULL,
+  `direction` enum('in', 'out') DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `route` (`name`,`direction`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -62,4 +80,4 @@ CREATE TABLE `fuel_stops` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-06-20 17:44:13
+-- Dump completed on 2015-07-05 14:21:21
