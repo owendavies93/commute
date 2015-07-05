@@ -48,8 +48,9 @@ get '/commutes' => sub { shift->redirect_to('/commute/commutes/all') };
 
 get '/commutes/all' => sub {
     my $c = shift;
-    my $res = $c->app->dbh->selectall_arrayref(
-        'SELECT * FROM commutes', { Slice => {} });
+    my $res = $c->app->dbh->selectall_arrayref(q(
+        SELECT * FROM commutes JOIN routes ON commutes.route_id = routes.id
+    ), { Slice => {} });
     $c->render(json => $res);
 };
 
