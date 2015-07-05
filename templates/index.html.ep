@@ -54,10 +54,21 @@ $(document).ready(function() {
           .fail(function() { $('.start-status').text("Couldn't start!"); });
     });
 
-    $('#lap_button').on('click', function() {
-        $.post('commutes/intermediate').done(function() { $('.lap-status').text("Added!"); })
-                                       .fail(function() { $('.lap-status').text("Couldn't add!"); });
-    });
+    var tries = 0;
+    function try_lap() {
+        $.post('commutes/intermediate', {
+            time: Date.now()
+        })
+        .done(function() { $('.lap-status').text("Added!"); })
+        .fail(function() {
+            $('.lap-status').text("Couldn't add!");
+            if (tries < 10) {
+                setTimeout(try_lap, 10000);
+            }
+        });
+    }
+
+    $('#lap_button').on('click', try_lap);
 
     $('#end_button').on('click', function() {
         $.post('commutes/end', {

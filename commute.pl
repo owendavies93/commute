@@ -75,14 +75,20 @@ post '/commutes/start' => sub {
 
 post '/commutes/intermediate' => sub {
     my $c = shift;
+    my $time = $c->param('time');
+
+    if (defined $time) {
+        $time = localtime($time)->strftime('%F %T');
+    }
+    $time //= 'NOW()';
 
     my $status = $c->app->dbh->do(q(
         UPDATE commutes SET
         intermediate_timestamp = NOW(),
-        intermediate_time = TIMESTAMPDIFF(SECOND, start_time, NOW())
+        intermediate_time = TIMESTAMPDIFF(SECOND, start_time, ?)
         WHERE end_time IS NULL
         ORDER BY id DESC LIMIT 1
-    ), undef);
+    ), undef, $time);
     return $c->render(json => { message => ($status ? 'Added' : 'Failed') });
 };
 
