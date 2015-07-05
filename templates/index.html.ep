@@ -8,6 +8,16 @@
 <body>
 <div class="container text-center" style="max-width:400px">
     <h2>Enjoy the drive!</h2>
+    <div class="form-group">
+        <label class="radio-inline">
+            <input type="radio" name="direction" id="in" value="in" <% if ($default_dir eq 'in') { %>checked<% } %> />
+            In
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="direction" id="out" value="out" <% if ($default_dir eq 'out') { %>checked<% } %> />
+            Out
+        </label> 
+    </div>
     <div><a class="btn btn-lg btn-success" id="start_button">Start Commute</a><p class="start-status"></p></div>
     <hr/>
     <div><a class="btn btn-lg btn-primary" id="lap_button">Add Intermediate Time</a><p class="lap-status"></p></div>
@@ -38,8 +48,10 @@
 <script>
 $(document).ready(function() {
     $('#start_button').on('click', function() {
-        $.post('commutes/start').done(function() { $('.start-status').text("Go go go!"); })
-                                .fail(function() { $('.start-status').text("Couldn't start!"); });
+        $.post('commutes/start', {
+            direction: $('input:radio[name=direction]:checked').val(),  
+        }).done(function() { $('.start-status').text("Go go go!"); })
+          .fail(function() { $('.start-status').text("Couldn't start!"); });
     });
 
     $('#lap_button').on('click', function() {

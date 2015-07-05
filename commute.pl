@@ -34,7 +34,15 @@ under sub {
     return undef;
 };
 
-get '/' => sub { shift->render(template => 'index') };
+get '/' => sub { 
+    my $c = shift;
+
+    my $hour = localtime->[2];
+    $c->stash(
+        default_dir => (int($hour) <= 12 ? 'in' : 'out'),
+    );
+    $c->render(template => 'index') 
+};
 
 get '/commutes' => sub { shift->redirect_to('/commute/commutes/all') };
 
