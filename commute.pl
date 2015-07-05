@@ -37,9 +37,14 @@ under sub {
 get '/' => sub { 
     my $c = shift;
 
+    my $routes = $c->app->dbh->selectcol_arrayref(q(
+        SELECT DISTINCT name FROM routes
+    ), undef);
+
     my $hour = localtime->[2];
     $c->stash(
         default_dir => (int($hour) <= 12 ? 'in' : 'out'),
+        routes      => $routes,
     );
     $c->render(template => 'index') 
 };
@@ -85,12 +90,20 @@ post '/commutes/end' => sub {
     my $c = shift;
     my $mpg = $c->param('mpg');
     my $len = $c->param('length');
+    my $r   = $c->param('route');
+
+    my ($direction) = $c->app->dbh->selectrow_array(q(
+        SELECT direction FROM commutes ORDER BY id DESC LIMIT 1
+    ), undef);
+    my ($route_id) = $c->app->dbh->selectrow_array(q(
+        SELECT id FROM routes WHERE name = ? AND direction = ?
+    ), undef, $r, $direction);
 
     my $status = $c->app->dbh->do(q(
-        UPDATE commutes SET end_time = NOW(), mpg = ?, length = ?,
+        UPDATE commutes SET end_time = NOW(), mpg = ?, route_id = ?,
         total_time = TIMESTAMPDIFF(SECOND, start_time, NOW())
         ORDER BY id DESC LIMIT 1
-    ), undef, $mpg, $len);
+    ), undef, $mpg, $route_id);
     my ($commute_id) = $c->app->dbh->selectrow_array('SELECT MAX(id) FROM commutes');
     return $c->render(json => {
         message => ($status ? 'Ended' : 'Failed'),

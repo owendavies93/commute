@@ -27,7 +27,7 @@
             <input type="text" class="form-control input-lg" id="mpg" placeholder="MPG" />
         </div>
         <div class="form-group">
-            <input type="text" class="form-control input-lg" id="length" placeholder="Journey Distance (miles)" />
+            %= select_field route => $routes, id => 'route', class => 'form-control input-lg'
         </div>
         <div class="form-group">
         <div class="checkbox">
@@ -62,7 +62,7 @@ $(document).ready(function() {
     $('#end_button').on('click', function() {
         $.post('commutes/end', {
             mpg: $("#mpg").val(),
-            length: $("#length").val(),
+            route: $("#route").val(),
         }).done(function(data) {
             $('.end-status').text("Ended");
 
