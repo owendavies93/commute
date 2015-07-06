@@ -78,17 +78,18 @@ post '/commutes/intermediate' => sub {
     my $time = $c->param('time');
 
     if (defined $time) {
+        $time = $time / 1000;
         $time = localtime($time)->strftime('%F %T');
     }
     $time //= 'NOW()';
 
     my $status = $c->app->dbh->do(q(
         UPDATE commutes SET
-        intermediate_timestamp = NOW(),
+        intermediate_timestamp = ?,
         intermediate_time = TIMESTAMPDIFF(SECOND, start_time, ?)
         WHERE end_time IS NULL
         ORDER BY id DESC LIMIT 1
-    ), undef, $time);
+    ), undef, $time, $time);
     return $c->render(json => { message => ($status ? 'Added' : 'Failed') });
 };
 
