@@ -14,8 +14,8 @@ plugin 'basic_auth';
 app->attr(dbh => sub {
     my $c = shift;
     return DBI->connect(
-        'dbi:mysql:commute:', 
-        $config->{database}->{username}, 
+        'dbi:mysql:commute:',
+        $config->{database}->{username},
         $config->{database}->{password},
         {RaiseError => 1, AutoCommit => 1, mysql_auto_reconnect => 1}
     );
@@ -34,7 +34,7 @@ under sub {
     return undef;
 };
 
-get '/' => sub { 
+get '/' => sub {
     my $c = shift;
 
     my $routes = $c->app->dbh->selectcol_arrayref(q(
@@ -46,7 +46,12 @@ get '/' => sub {
         default_dir => (int($hour) <= 12 ? 'in' : 'out'),
         routes      => $routes,
     );
-    $c->render(template => 'index') 
+    $c->render(template => 'index');
+};
+
+get '/stats' => sub {
+    my $c = shift;
+    $c->render(template => 'stats');
 };
 
 get '/commutes' => sub { shift->redirect_to('/commute/commutes/all') };
@@ -65,7 +70,7 @@ post '/commutes/start' => sub {
     my $hour = localtime->[2];
     my $dir  = $c->param('direction');
     $dir //= (int($hour) <= 12 ? 'in' : 'out');
-    
+
     my $status = $c->app->dbh->do(q(
         INSERT INTO commutes (start_time, direction)
         VALUES (CURRENT_TIMESTAMP, ?)
