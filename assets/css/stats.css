@@ -2,6 +2,14 @@
     margin-top: 30px;
 }
 
+/*div*/.stats-summary {
+    padding-top: 100px;
+}
+
+/*span*/.stat {
+    font-weight: bold;
+}
+
 /*
     Generic chart styles. Mostly just default d3 stuff
 */

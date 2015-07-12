@@ -8,12 +8,28 @@
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="assets/js/d3.tip.v0.6.3.js"></script>
+    <script src="assets/js/simple_statistics.js"></script>
     <script src="assets/js/stats.js"></script>
 </head>
 <body>
-    <div class="container text-center">
+    <div class="container">
         <h2>All Journeys</h2>
-        <div id="main-graph-container"></div>
+        <div class="row">
+            <div class="col-md-9">
+                <div id="main-graph-container"></div>
+            </div>
+            <div class="col-md-3 stats-summary">
+                <p class="lead">
+                    Total: <span id="stat-total" class="stat"></span><br/>
+                    Average Time: <span id="stat-avg" class="stat"></span><br/>
+                    Median Time: <span id="stat-med" class="stat"></span><br/>
+                    StdDev: <span id="stat-sd" class="stat"></span><br/>
+                    Range: <span id="stat-range" class="stat"></span><br/>
+                    IQ Range: <span id="stat-iqr" class="stat"></span><br/>
+                    IQ Average: <span id="stat-iqa" class="stat"></span>
+                </p>
+            </div>
+        </div>
     </div>
 </body>
 </html>

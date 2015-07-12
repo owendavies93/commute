@@ -1,6 +1,6 @@
 var margins   = { top: 40, right: 30, bottom: 70, left: 60 };
-var width     = 960 - margins.left - margins.right;
-var height    = 600 - margins.top - margins.bottom;
+var width     = 850 - margins.left - margins.right;
+var height    = 500 - margins.top - margins.bottom;
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 
 var dateFormatter = d3.time.format("%b %d");
@@ -9,6 +9,21 @@ var timeFormatter = function(d) {
   var secs = d % 60;
   secs = (secs < 10) ? '0' + secs : secs;
   return mins + ":" + secs;
+}
+
+function members_of_quantile_range(arr, x, y) {
+  var l = ss.quantile(arr, x);
+  var u = ss.quantile(arr, y);
+
+  var res = [];
+  for (var i = 0; i < arr.length; i++) {
+    var m = arr[i];
+    if (m >= l && m <= u) {
+      res.push(m);
+    }
+  }
+  console.log(res);
+  return res;
 }
 
 function buildMainChart() {
@@ -79,6 +94,37 @@ function buildMainChart() {
         .attr("height", function(d) { return height - y(d.total_time); })
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
+
+    var times = data.map(function(d) { return d.total_time });
+    var avg = ss.mean(times);
+
+    var avgLine = d3.svg.line()
+                    .x(function(d, i) {
+                        if (i == 0) return 0;
+                        if (i == data.length - 1) return i * (width / data.length) + (width / data.length);
+                        return i * (width / data.length) + (width / data.length) / 2;
+                    })
+                    .y(function(d, i) { return y(avg); });
+
+    svg.append("path")
+        .attr("d", avgLine(data))
+        .attr("stroke", "darkgreen")
+        .attr("stroke-width", 2);
+
+    var total  = data.length;
+    var median = timeFormatter(Math.round(ss.median(times)));
+    var stddev = ss.standard_deviation(times).toFixed(2);
+    var range  = ss.max(times) - ss.min(times);
+    var iqr    = ss.iqr(times);
+    var iqa    = timeFormatter(Math.round(ss.mean(members_of_quantile_range(times, 0.25, 0.75))));
+
+    $('#stat-total').html(total);
+    $('#stat-avg').html(timeFormatter(Math.round(avg)));
+    $('#stat-med').html(median);
+    $('#stat-sd').html(stddev + " secs");
+    $('#stat-range').html(range + " secs");
+    $('#stat-iqr').html(iqr + " secs");
+    $('#stat-iqa').html(iqa);
   });
 }
 
