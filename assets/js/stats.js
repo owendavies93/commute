@@ -97,19 +97,43 @@ function buildMainChart() {
 
     var times = data.map(function(d) { return d.total_time });
     var avg = ss.mean(times);
+    var lowerQ = ss.quantile(times, 0.25);
+    var upperQ = ss.quantile(times, 0.75);
+
+    function straightLineGenerator(d, i) {
+      if (i == 0) return 0;
+      if (i == data.length - 1) return i * (width / data.length) + (width / data.length);
+      return i * (width / data.length) + (width / data.length) / 2;
+    }
 
     var avgLine = d3.svg.line()
-                    .x(function(d, i) {
-                        if (i == 0) return 0;
-                        if (i == data.length - 1) return i * (width / data.length) + (width / data.length);
-                        return i * (width / data.length) + (width / data.length) / 2;
-                    })
+                    .x(straightLineGenerator)
                     .y(function(d, i) { return y(avg); });
+
+    var lQLine = d3.svg.line()
+                    .x(straightLineGenerator)
+                    .y(function(d, i) { return y(lowerQ); });
+
+    var uQLine = d3.svg.line()
+                    .x(straightLineGenerator)
+                    .y(function(d, i) { return y(upperQ); });
 
     svg.append("path")
         .attr("d", avgLine(data))
         .attr("stroke", "darkgreen")
         .attr("stroke-width", 2);
+
+    svg.append("path")
+        .attr("d", lQLine(data))
+        .attr("stroke", "#555")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "10, 5");
+
+    svg.append("path")
+        .attr("d", uQLine(data))
+        .attr("stroke", "#555")
+        .attr("stroke-width", 1)
+        .attr("stroke-dasharray", "10, 5");
 
     var total  = data.length;
     var median = timeFormatter(Math.round(ss.median(times)));
