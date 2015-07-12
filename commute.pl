@@ -59,7 +59,11 @@ get '/commutes' => sub { shift->redirect_to('/commute/commutes/all') };
 get '/commutes/all' => sub {
     my $c = shift;
     my $res = $c->app->dbh->selectall_arrayref(q(
-        SELECT * FROM commutes JOIN routes ON commutes.route_id = routes.id
+        SELECT c.id, DATE(c.end_time) AS date, c.total_time, c.mpg,
+               c.start_time, c.end_time, c.direction,
+               c.intermediate_timestamp, c.intermediate_time,
+               r.name, r.length, r.intermediate_length
+        FROM commutes c JOIN routes r ON c.route_id = r.id
     ), { Slice => {} });
     $c->render(json => $res);
 };
