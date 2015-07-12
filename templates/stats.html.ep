@@ -9,7 +9,7 @@
     <script src="assets/js/stats.js"></script>
 </head>
 <body>
-    <div class="container-fluid">
+    <div class="container">
         <div id="main-graph-container"></div>
     </div>
 </body>
