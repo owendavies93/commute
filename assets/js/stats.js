@@ -3,29 +3,35 @@ var width     = 960 - margins.left - margins.right;
 var height    = 600 - margins.top - margins.bottom;
 var parseDate = d3.time.format("%Y-%m-%d").parse;
 
-function buildMainChart() {
-  var x = d3.time.scale()
-            .range([0, width]);
-  var y = d3.scale.linear()
-            .range([height, 0]);
+var dateFormatter = d3.time.format("%b %d");
+var timeFormatter = function(d) {
+  var mins = Math.floor(d / 60);
+  var secs = d % 60;
+  secs = (secs < 10) ? '0' + secs : secs;
+  return mins + ":" + secs;
+}
 
-  var timeFormatter = d3.time.format("%b %d");
+function buildMainChart() {
+  var x = d3.time.scale().range([0, width]);
+  var y = d3.scale.linear().range([height, 0]);
+
   var xAxis = d3.svg.axis()
                 .scale(x)
                 .orient("bottom")
                 .ticks(10)
-                .tickFormat(timeFormatter);
+                .tickFormat(dateFormatter);
 
   var yAxis = d3.svg.axis()
                 .scale(y)
                 .orient("left")
-                .ticks(5);
+                .ticks(10)
+                .tickFormat(timeFormatter);
 
   var tip = d3.tip()
               .attr('class', 'd3-tip')
               .offset([-10, 0])
               .html(function(d) {
-                return "Date: <strong>" + timeFormatter(d.date) + "</strong><br>Total Time: <strong>" + d.total_time + "</strong><br>Direction: <strong>" + d.direction + "</strong>";
+                return "Date: <strong>" + dateFormatter(d.date) + "</strong><br>Total Time: <strong>" + timeFormatter(d.total_time) + "</strong><br>Direction: <strong>" + d.direction + "</strong>";
               });
 
   var svg = d3.select("#main-graph-container").append("svg")
@@ -61,7 +67,7 @@ function buildMainChart() {
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .text("Total Time (seconds)");
+        .text("Total Time (mins:secs)");
 
     svg.selectAll(".bar")
         .data(data)
