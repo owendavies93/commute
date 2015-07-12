@@ -9,22 +9,32 @@ function buildMainChart() {
   var y = d3.scale.linear()
             .range([height, 0]);
 
+  var timeFormatter = d3.time.format("%b %d");
   var xAxis = d3.svg.axis()
                 .scale(x)
                 .orient("bottom")
                 .ticks(10)
-                .tickFormat(d3.time.format("%b %d"));
+                .tickFormat(timeFormatter);
 
   var yAxis = d3.svg.axis()
                 .scale(y)
                 .orient("left")
                 .ticks(5);
 
+  var tip = d3.tip()
+              .attr('class', 'd3-tip')
+              .offset([-10, 0])
+              .html(function(d) {
+                return "Date: <strong>" + timeFormatter(d.date) + "</strong><br>Total Time: <strong>" + d.total_time + "</strong><br>Direction: <strong>" + d.direction + "</strong>";
+              });
+
   var svg = d3.select("#main-graph-container").append("svg")
               .attr("width", width + margins.left + margins.right)
               .attr("height", height + margins.top + margins.bottom)
               .append("g")
               .attr("transform", "translate(" + margins.left + "," + margins.top + ")");
+
+  svg.call(tip);
 
   d3.json('/commute/commutes/all', function(error, data) {
     if (error) throw error;
@@ -60,7 +70,9 @@ function buildMainChart() {
         .attr("x", function(d, i) { return i * (width / data.length) + 5; })
         .attr("width", (width / data.length) - 5)
         .attr("y", function(d) { return y(d.total_time); })
-        .attr("height", function(d) { return height - y(d.total_time); });
+        .attr("height", function(d) { return height - y(d.total_time); })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
   });
 }
 

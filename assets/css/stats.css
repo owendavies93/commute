@@ -2,6 +2,9 @@
     margin-top: 30px;
 }
 
+/*
+    Generic chart styles. Mostly just default d3 stuff
+*/
 .bar {
     fill: steelblue;
 }
@@ -19,4 +22,30 @@
     fill: none;
     stroke: #000;
     shape-rendering: crispEdges;
+}
+
+/*
+    Tooltip styles
+*/
+.d3-tip {
+    line-height: 1.4;
+    font-size: 12px;
+    padding: 8px;
+    background: #eee;
+    border: 1px solid #ccc;
+}
+
+.d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 12px;
+    width: 100%;
+    line-height: 1;
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+    color: #ccc;
+    margin: -3px 0 0 0;
+    top: 100%;
+    left: 0;
 }
