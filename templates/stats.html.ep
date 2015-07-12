@@ -3,13 +3,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Commute Statistics</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/style/css/style.css">
     <link rel="stylesheet" href="assets/css/stats.css">
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="assets/js/stats.js"></script>
 </head>
 <body>
-    <div class="container">
+    <div class="container text-center">
+        <h2>All Journeys</h2>
         <div id="main-graph-container"></div>
     </div>
 </body>
