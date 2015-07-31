@@ -32,7 +32,7 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <h2 class="text-center">Inbound Journeys</h2>
+                <h3 class="text-center">Inbound Journeys</h3>
                 <div id="inbound-graph-cont"></div>
                 <p class="text-center inbound-stats">
                     Total: <span class="stat-total stat"></span><br/>
@@ -45,7 +45,7 @@
                 </p>
             </div>
             <div class="col-md-6">
-                <h2 class="text-center">Outbound Journeys</h2>
+                <h3 class="text-center">Outbound Journeys</h3>
                 <div id="outbound-graph-cont"></div>
                 <p class="text-center outbound-stats">
                     Total: <span class="stat-total stat"></span><br/>
@@ -58,7 +58,16 @@
                 </p>
             </div>
         </div>
-
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="text-center">Inbound Start Times</h3>
+                <div id="inbound-scatter-cont"></div>
+            </div>
+            <div class="col-md-6">
+                <h3 class="text-center">Outbound Start Times</h3>
+                <div id="outbound-scatter-cont"></div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
