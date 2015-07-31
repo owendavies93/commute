@@ -26,17 +26,8 @@ function buildBarChart(height, width, margins, container) {
   var x = d3.time.scale().range([0, width]);
   var y = d3.scale.linear().range([height, 0]);
 
-  var xAxis = d3.svg.axis()
-                .scale(x)
-                .orient("bottom")
-                .ticks(10)
-                .tickFormat(dateFormatter);
-
-  var yAxis = d3.svg.axis()
-                .scale(y)
-                .orient("left")
-                .ticks(10)
-                .tickFormat(timeFormatter);
+  var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(10).tickFormat(dateFormatter);
+  var yAxis = d3.svg.axis().scale(y).orient("left")  .tickFormat(timeFormatter);
 
   var tip = d3.tip()
               .attr('class', 'd3-tip')
@@ -64,7 +55,9 @@ function buildBarChart(height, width, margins, container) {
 
 function populateBarChart(chart, data, height, width, min, max) {
   chart.x.domain(d3.extent(data, function(d) { return d.date }));
-  chart.y.domain([min - 500, max]);
+  chart.y.domain([min - 600, max + 60]);
+
+  chart.yAxis.tickValues(d3.range(Math.floor(min / 600) * 600, max, 600));
 
   chart.svg.append("g")
       .attr("class", "x axis")
