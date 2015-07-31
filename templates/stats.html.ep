@@ -16,20 +16,49 @@
         <h2 class="text-center">All Journeys</h2>
         <div class="row">
             <div class="col-md-9">
-                <div id="main-graph-container"></div>
+                <div id="bidir-graph-cont"></div>
             </div>
             <div class="col-md-3 stats-summary">
                 <p class="lead">
-                    Total: <span id="stat-total" class="stat"></span><br/>
-                    Average Time: <span id="stat-avg" class="stat"></span><br/>
-                    Median Time: <span id="stat-med" class="stat"></span><br/>
-                    StdDev: <span id="stat-sd" class="stat"></span><br/>
-                    Range: <span id="stat-range" class="stat"></span><br/>
-                    IQ Range: <span id="stat-iqr" class="stat"></span><br/>
-                    IQ Average: <span id="stat-iqa" class="stat"></span>
+                    Total: <span class="stat-total stat"></span><br/>
+                    Average Time: <span class="stat-avg stat"></span><br/>
+                    Median Time: <span class="stat-med stat"></span><br/>
+                    StdDev: <span class="stat-sd stat"></span><br/>
+                    Range: <span class="stat-range stat"></span><br/>
+                    IQ Range: <span class="stat-iqr stat"></span><br/>
+                    IQ Average: <span class="stat-iqa stat"></span>
                 </p>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="text-center">Inbound Journeys</h2>
+                <div id="inbound-graph-cont"></div>
+                <p class="text-center inbound-stats">
+                    Total: <span class="stat-total stat"></span><br/>
+                    Average Time: <span class="stat-avg stat"></span><br/>
+                    Median Time: <span class="stat-med stat"></span><br/>
+                    StdDev: <span class="stat-sd stat"></span><br/>
+                    Range: <span class="stat-range stat"></span><br/>
+                    IQ Range: <span class="stat-iqr stat"></span><br/>
+                    IQ Average: <span class="stat-iqa stat"></span>
+                </p>
+            </div>
+            <div class="col-md-6">
+                <h2 class="text-center">Outbound Journeys</h2>
+                <div id="outbound-graph-cont"></div>
+                <p class="text-center outbound-stats">
+                    Total: <span class="stat-total stat"></span><br/>
+                    Average Time: <span class="stat-avg stat"></span><br/>
+                    Median Time: <span class="stat-med stat"></span><br/>
+                    StdDev: <span class="stat-sd stat"></span><br/>
+                    Range: <span class="stat-range stat"></span><br/>
+                    IQ Range: <span class="stat-iqr stat"></span><br/>
+                    IQ Average: <span class="stat-iqa stat"></span>
+                </p>
+            </div>
+        </div>
+
     </div>
 </body>
 </html>
