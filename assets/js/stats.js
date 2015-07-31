@@ -160,8 +160,8 @@ $(document).ready(function() {
   var height        = 500 - big_margins.top - big_margins.bottom;
 
   var bidir_svg    = buildBarChart(height, width, big_margins, "#bidir-graph-cont");
-  var inbound_svg  = buildBarChart((3 * height) / 4, width / 2, small_margins, "#inbound-graph-cont");
-  var outbound_svg = buildBarChart((3 * height) / 4, width / 2, small_margins, "#outbound-graph-cont");
+  var inbound_svg  = buildBarChart((3 * height) / 4, width / 2 + 50, small_margins, "#inbound-graph-cont");
+  var outbound_svg = buildBarChart((3 * height) / 4, width / 2 + 50, small_margins, "#outbound-graph-cont");
 
   d3.json('/commute/commutes/all', function(error, data) {
     if (error) throw error;
@@ -185,13 +185,13 @@ $(document).ready(function() {
     var inbound = data.filter(function(v) {
       return v.direction === 'in';
     });
-    populateBarChart(inbound_svg, inbound, (3 * height) / 4, width / 2, min, max);
+    populateBarChart(inbound_svg, inbound, (3 * height) / 4, width / 2 + 50, min, max);
     populateStats($(".inbound-stats"), inbound);
 
     var outbound = data.filter(function(v) {
       return v.direction === 'out';
     });
-    populateBarChart(outbound_svg, outbound, (3 * height) / 4, width / 2, min, max);
+    populateBarChart(outbound_svg, outbound, (3 * height) / 4, width / 2 + 50, min, max);
     populateStats($(".outbound-stats"), outbound);
   });
 });
