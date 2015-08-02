@@ -9,6 +9,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="assets/js/d3.tip.v0.6.3.js"></script>
     <script src="assets/js/simple_statistics.js"></script>
+    <script src="assets/js/stats/datetime.js"></script>
+    <script src="assets/js/stats/util.js"></script>
+    <script src="assets/js/stats/chart.js"></script>
+    <script src="assets/js/stats/barchart.js"></script>
+    <script src="assets/js/stats/scatterchart.js"></script>
     <script src="assets/js/stats.js"></script>
 </head>
 <body>
