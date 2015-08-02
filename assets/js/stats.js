@@ -170,12 +170,7 @@ function populateScatterChart(chart, data, height, width, min, max) {
   chart.svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
-      .call(chart.xAxis)
-      .append("text")
-      .attr("x", width)
-      .attr("y", -6)
-      .style("text-anchor", "end")
-      .text("Start Time");
+      .call(chart.xAxis);
 
   chart.svg.append("g")
       .attr("class", "y axis")

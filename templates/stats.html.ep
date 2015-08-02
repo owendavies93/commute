@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6 small-graph-cont">
                 <h3 class="text-center">Inbound Journeys</h3>
                 <div id="inbound-graph-cont"></div>
                 <p class="text-center inbound-stats">
@@ -44,7 +44,7 @@
                     IQ Average: <span class="stat-iqa stat"></span>
                 </p>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 small-graph-cont">
                 <h3 class="text-center">Outbound Journeys</h3>
                 <div id="outbound-graph-cont"></div>
                 <p class="text-center outbound-stats">
@@ -59,11 +59,11 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6 small-graph-cont">
                 <h3 class="text-center">Inbound Start Times</h3>
                 <div id="inbound-scatter-cont"></div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 small-graph-cont">
                 <h3 class="text-center">Outbound Start Times</h3>
                 <div id="outbound-scatter-cont"></div>
             </div>
