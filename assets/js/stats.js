@@ -30,6 +30,29 @@ function members_of_quantile_range(arr, x, y) {
   return res;
 }
 
+function leastSquares(xs, ys) {
+  var xBar = ss.mean(xs);
+  var yBar = ss.mean(ys);
+
+  var ssXX = ss.sum(xs.map(function(d) {
+    return Math.pow(d - xBar, 2);
+  }));
+
+  var ssYY = ss.sum(ys.map(function(d) {
+    return Math.pow(d - yBar, 2);
+  }));
+
+  var ssXY = ss.sum(xs.map(function(d, i) {
+    return (d - xBar) * (ys[i] - yBar);
+  }));
+
+  var slope = ssXY / ssXX;
+  var intercept = yBar - (xBar * slope);
+  var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
+
+  return [slope, intercept, rSquare];
+}
+
 function buildBaseChart(height, width, margins, container) {
   return d3.select(container).append("svg")
           .attr("width", width + margins.left + margins.right)
@@ -157,8 +180,11 @@ function populateBarChart(chart, data, height, width, min, max) {
 }
 
 function populateScatterChart(chart, data, height, width, min, max) {
-  var minStart = d3.min(data.map(function(d) { return d.start_time }));
-  var maxStart = d3.max(data.map(function(d) { return d.start_time }));
+  var startTimes = data.map(function(d) { return d.start_time });
+  var totals     = data.map(function(d) { return d.total_time });
+
+  var minStart = d3.min(startTimes);
+  var maxStart = d3.max(startTimes);
   var diff     = ((maxStart - minStart) * 0.1);
 
   chart.x.domain([minStart - diff, maxStart + diff]);
@@ -189,6 +215,24 @@ function populateScatterChart(chart, data, height, width, min, max) {
       .attr("r", 2)
       .attr("cx", function(d) { return chart.x(d.start_time); })
       .attr("cy", function(d) { return chart.y(d.total_time); });
+
+  var ls = leastSquares(startTimes, totals);
+  var x1 = minStart - (diff / 2);
+  var y1 = (ls[0] * x1) + ls[1];
+  var x2 = maxStart + (diff / 2);
+  var y2 = (ls[0] * x2) + ls[1];
+  var trend = [[x1, y1, x2, y2]];
+
+  var trendline = chart.svg.selectAll(".trendline")
+      .data(trend)
+      .enter().append("line")
+      .attr("class", "trendline")
+      .attr("x1", function(d) { return chart.x(d[0]) })
+      .attr("y1", function(d) { return chart.y(d[1]) })
+      .attr("x2", function(d) { return chart.x(d[2]) })
+      .attr("y2", function(d) { return chart.y(d[3]) })
+      .attr("stroke", "darkgreen")
+      .attr("stroke-width", 2);
 }
 
 function populateStats(container, data) {
