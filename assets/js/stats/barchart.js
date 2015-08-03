@@ -6,11 +6,11 @@ function buildBarChart(height, width, margins, container) {
   var yAxis = d3.svg.axis().scale(y).orient("left")  .tickFormat(timeFormatter);
 
   var tip = d3.tip()
-              .attr('class', 'd3-tip')
-              .offset([-10, 0])
-              .html(function(d) {
-                return "Date: <strong>" + dateFormatter(d.date) + "</strong><br>Total Time: <strong>" + timeFormatter(d.total_time) + "</strong><br>Direction: <strong>" + d.direction + "</strong>";
-              });
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function(d) {
+      return "Date: <strong>" + dateFormatter(d.date) + "</strong><br>Total Time: <strong>" + timeFormatter(d.total_time) + "</strong><br>Direction: <strong>" + d.direction + "</strong>";
+    });
 
   var svg = buildBaseChart(height, width, margins, container);
 

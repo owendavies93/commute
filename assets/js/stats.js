@@ -10,6 +10,7 @@ $(document).ready(function() {
 
   var i_scatter_svg = buildScatterChart((3 * height) / 4, width / 2 + 50, small_margins, "#inbound-scatter-cont");
   var o_scatter_svg = buildScatterChart((3 * height) / 4, width / 2 + 50, small_margins, "#outbound-scatter-cont");
+  var b_scatter_svg = buildScatterChart(height, width, big_margins, "#big-scatter-cont");
 
   d3.json('/commute/commutes/all', function(error, data) {
     if (error) throw error;
@@ -47,5 +48,6 @@ $(document).ready(function() {
 
     populateScatterChart(i_scatter_svg, inbound, (3 * height) / 4, width / 2 + 50, min, max);
     populateScatterChart(o_scatter_svg, outbound, (3 * height) / 4, width / 2 + 50, min, max);
+    populateRelationChart(b_scatter_svg, data, height, width, min, max);
   });
 });
