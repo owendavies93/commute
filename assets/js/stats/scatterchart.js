@@ -160,13 +160,13 @@ function populateRelationChart(chart, data, height, width, min, max) {
 
   var inboundRanges  = { min: d3.min(inboundStarts), max: d3.max(inboundStarts) };
   var outboundRanges = { min: d3.min(outboundStarts), max: d3.max(outboundStarts) };
-  var inboundAverage = ss.mean(inbound.map(function(d) { return d.total_time })) / 3600;
+  var inboundAverage = ss.mean(inbound.map(function(d) { return d.total_time }));
   var eightMins      = minimiseTotal(
-    (8 + inboundAverage) * 60 * 60, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
+    (8 * 60 * 60) + inboundAverage, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
   var eightHalfMins  = minimiseTotal(
-    (8.5 + inboundAverage) * 60 * 60, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
+    (8.5 * 60 * 60) + inboundAverage, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
   var nineMins  = minimiseTotal(
-    (9 + inboundAverage) * 60 * 60, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
+    (9 * 60 * 60) + inboundAverage, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
 
   chart.svg.selectAll(".resultline1")
     .data(eightMins[1])
