@@ -34,3 +34,24 @@ function leastSquares(xs, ys) {
 
   return [slope, intercept, rSquare];
 }
+
+function minimiseTotal(targetTime, startTimeFunc, endTimeFunc, startRange, endRange) {
+  var result = Number.MAX_VALUE;
+  var data = {};
+
+  for (var start = startRange.min; start <= startRange.max; start++) {
+    var end = start + targetTime;
+
+    if (end < endRange.min || end > endRange.max) continue;
+
+    var startTime = startTimeFunc(start);
+    var endTime   = endTimeFunc(end);
+
+    if (startTime + endTime < result) {
+      result = startTime + endTime;
+      data = [start, startTime, end, endTime];
+    }
+  }
+
+  return [result, [data]];
+}

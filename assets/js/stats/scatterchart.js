@@ -56,6 +56,35 @@ function baseScatter(chart, ranges) {
     .text("Total Time (mins:secs)");
 }
 
+function addTrendline (chart, xs, ys, c) {
+  var minX = d3.min(xs);
+  var maxX = d3.max(xs);
+
+  var ls = leastSquares(xs, ys);
+  var x1 = minX - 5000;
+  var y1 = (ls[0] * x1) + ls[1];
+  var x2 = maxX + 5000;
+  var y2 = (ls[0] * x2) + ls[1];
+
+  var trend = [[x1, y1, x2, y2]];
+
+  chart.svg.selectAll("." + c)
+    .data(trend)
+    .enter().append("line")
+    .attr("class", c)
+    .attr("x1", function(d) { return chart.x(d[0]) })
+    .attr("y1", function(d) { return chart.y(d[1]) })
+    .attr("x2", function(d) { return chart.x(d[2]) })
+    .attr("y2", function(d) { return chart.y(d[3]) })
+    .attr("stroke", "darkgreen")
+    .attr("stroke-width", 1);
+
+  var generator = function(x) {
+    return x * ls[0] + ls[1];
+  }
+  return generator;
+}
+
 function populateScatterChart(chart, data, height, width, min, max) {
   var startTimes = data.map(function(d) { return d.start_time });
   var totals     = data.map(function(d) { return d.total_time });
@@ -82,24 +111,7 @@ function populateScatterChart(chart, data, height, width, min, max) {
     .on('mouseover', chart.tip.show)
     .on('mouseout', chart.tip.hide);
 
-  var diff = (maxStart - minStart) * 0.1;
-  var ls = leastSquares(startTimes, totals);
-  var x1 = minStart - (diff / 2);
-  var y1 = (ls[0] * x1) + ls[1];
-  var x2 = maxStart + (diff / 2);
-  var y2 = (ls[0] * x2) + ls[1];
-  var trend = [[x1, y1, x2, y2]];
-
-  var trendline = chart.svg.selectAll(".trendline")
-    .data(trend)
-    .enter().append("line")
-    .attr("class", "trendline")
-    .attr("x1", function(d) { return chart.x(d[0]) })
-    .attr("y1", function(d) { return chart.y(d[1]) })
-    .attr("x2", function(d) { return chart.x(d[2]) })
-    .attr("y2", function(d) { return chart.y(d[3]) })
-    .attr("stroke", "darkgreen")
-    .attr("stroke-width", 2);
+  addTrendline(chart, startTimes, totals, "scatter");
 }
 
 function populateRelationChart(chart, data, height, width, min, max) {
@@ -119,7 +131,6 @@ function populateRelationChart(chart, data, height, width, min, max) {
   baseScatter(chart, ranges);
 
   var colours = d3.scale.category10();
-  var lineColours = d3.scale.category20();
 
   var inbound = data.filter(function(v) {
     return v.direction === 'in';
@@ -127,39 +138,6 @@ function populateRelationChart(chart, data, height, width, min, max) {
   var outbound = data.filter(function(v) {
     return v.direction === 'out';
   });
-
-  for (var i = 0; i < inbound.length; i++) {
-    for (var j = 0; j < outbound.length; j++) {
-      if (inbound[i].date.getTime() == outbound[j].date.getTime()) {
-        inbound[i].end_start_time = outbound[j].start_time;
-        inbound[i].end_total_time = outbound[j].total_time;
-        break;
-      }
-    }
-  }
-
-  var inbound = inbound.filter(function(v) {
-    return v.end_start_time != null;
-  });
-  data = data.filter(function(v) {
-    return v.end_start_time != null || v.direction === 'out';
-  });
-
-  var maxDiff = d3.max(inbound.map(function(d) {
-    return Math.abs(d.end_total_time - d.total_time)
-  }));
-
-  chart.svg.selectAll(".link")
-    .data(inbound)
-    .enter().append("line")
-    .attr("class", "link")
-    .attr("x1", function(d) { return chart.x(d.start_time) })
-    .attr("y1", function(d) { return chart.y(d.total_time) })
-    .attr("x2", function(d) { return chart.x(d.end_start_time) })
-    .attr("y2", function(d) { return chart.y(d.end_total_time) })
-    .attr("stroke", function(d, i) { return lineColours(i) })
-    .attr("stroke-width", 1)
-    .attr("stroke-opacity", function(d) { return alphaGenerator(d, maxDiff) });
 
   chart.svg.selectAll(".dot")
     .data(data)
@@ -171,4 +149,55 @@ function populateRelationChart(chart, data, height, width, min, max) {
     .style("fill", function(d) { return colours(d.direction); })
     .on('mouseover', chart.tip.show)
     .on('mouseout', chart.tip.hide);
+
+  var inboundStarts = inbound.map(function(d) { return d.start_time });
+  var inboundTotals = inbound.map(function(d) { return d.total_time });
+  var inboundFunc   = addTrendline(chart, inboundStarts, inboundTotals, "inbound");
+
+  var outboundStarts = outbound.map(function(d) { return d.start_time });
+  var outboundTotals = outbound.map(function(d) { return d.total_time });
+  var outboundFunc   = addTrendline(chart, outboundStarts, outboundTotals, "outbound");
+
+  var inboundRanges  = { min: d3.min(inboundStarts), max: d3.max(inboundStarts) };
+  var outboundRanges = { min: d3.min(outboundStarts), max: d3.max(outboundStarts) };
+  var inboundAverage = ss.mean(inbound.map(function(d) { return d.total_time })) / 3600;
+  var eightMins      = minimiseTotal(
+    (8 + inboundAverage) * 60 * 60, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
+  var eightHalfMins  = minimiseTotal(
+    (8.5 + inboundAverage) * 60 * 60, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
+  var nineMins  = minimiseTotal(
+    (9 + inboundAverage) * 60 * 60, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
+
+  chart.svg.selectAll(".resultline1")
+    .data(eightMins[1])
+    .enter().append("line")
+    .attr("class", "resultline1")
+    .attr("x1", function(d) { return chart.x(d[0]) })
+    .attr("y1", function(d) { return chart.y(d[1]) })
+    .attr("x2", function(d) { return chart.x(d[2]) })
+    .attr("y2", function(d) { return chart.y(d[3]) })
+    .attr("stroke", "red")
+    .attr("stroke-width", 1);
+
+  chart.svg.selectAll(".resultline2")
+    .data(eightHalfMins[1])
+    .enter().append("line")
+    .attr("class", "resultline2")
+    .attr("x1", function(d) { return chart.x(d[0]) })
+    .attr("y1", function(d) { return chart.y(d[1]) })
+    .attr("x2", function(d) { return chart.x(d[2]) })
+    .attr("y2", function(d) { return chart.y(d[3]) })
+    .attr("stroke", "blue")
+    .attr("stroke-width", 1);
+
+  chart.svg.selectAll(".resultline3")
+    .data(nineMins[1])
+    .enter().append("line")
+    .attr("class", "resultline3")
+    .attr("x1", function(d) { return chart.x(d[0]) })
+    .attr("y1", function(d) { return chart.y(d[1]) })
+    .attr("x2", function(d) { return chart.x(d[2]) })
+    .attr("y2", function(d) { return chart.y(d[3]) })
+    .attr("stroke", "orange")
+    .attr("stroke-width", 1);
 }
