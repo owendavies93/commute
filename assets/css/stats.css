@@ -61,3 +61,7 @@
     top: 100%;
     left: 0;
 }
+
+.text-label {
+    font-size: 10px;
+}

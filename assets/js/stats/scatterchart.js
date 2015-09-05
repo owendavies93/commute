@@ -105,6 +105,14 @@ function addTrendline (chart, xs, ys, c) {
     .attr("stroke", "darkgreen")
     .attr("stroke-width", 1);
 
+  chart.svg.append("text")
+    .attr("x", chart.svg.attr("width") + 100)
+    .attr("y", chart.svg.attr("height") + 100)
+    .attr("dy", ".71em")
+    .attr("class", "text-label")
+    .style("fill", "black")
+    .text("RSq: " + ls[2]);
+
   var generator = function(x) {
     return x * ls[0] + ls[1];
   }

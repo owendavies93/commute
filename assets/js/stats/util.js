@@ -32,7 +32,7 @@ function leastSquares(xs, ys) {
   var intercept = yBar - (xBar * slope);
   var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
 
-  return [slope, intercept, rSquare];
+  return [slope, intercept, Math.round(rSquare * 1000) / 1000];
 }
 
 function minimiseTotal(targetTime, startTimeFunc, endTimeFunc, startRange, endRange) {
