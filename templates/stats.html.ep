@@ -79,6 +79,16 @@
                 <div id="big-scatter-cont">
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6 small-graph-cont">
+                <h3 class="text-center">Inbound Intermediate Times</h3>
+                <div id="inbound-inter-scatter-cont"></div>
+            </div>
+            <div class="col-md-6 small-graph-cont">
+                <h3 class="text-center">Outbound Intermediate Times</h3>
+                <div id="outbound-inter-scatter-cont"></div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

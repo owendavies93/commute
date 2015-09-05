@@ -10,6 +10,8 @@ $(document).ready(function() {
 
   var i_scatter_svg = buildScatterChart((3 * height) / 4, width / 2 + 50, small_margins, "#inbound-scatter-cont");
   var o_scatter_svg = buildScatterChart((3 * height) / 4, width / 2 + 50, small_margins, "#outbound-scatter-cont");
+  var i_i_scatter_svg = buildScatterChart((3 * height) / 4, width / 2 + 50, small_margins, "#inbound-inter-scatter-cont");
+  var o_i_scatter_svg = buildScatterChart((3 * height) / 4, width / 2 + 50, small_margins, "#outbound-inter-scatter-cont");
   var b_scatter_svg = buildScatterChart(height, width, big_margins, "#big-scatter-cont");
 
   d3.json('/commute/commutes/all', function(error, data) {
@@ -20,6 +22,7 @@ $(document).ready(function() {
     data.forEach(function(d) {
       d.date       = parseDate(d.date);
       d.total_time = +d.total_time;
+      d.intermediate_time = +d.intermediate_time;
 
       d.start_date = new Date(d.start_time);
       d.start_time = (d.start_date.getTime() - d.start_date.setHours(0, 0, 0, 0)) / 1000 ;
@@ -49,5 +52,16 @@ $(document).ready(function() {
     populateScatterChart(i_scatter_svg, inbound, (3 * height) / 4, width / 2 + 50, min, max);
     populateScatterChart(o_scatter_svg, outbound, (3 * height) / 4, width / 2 + 50, min, max);
     populateRelationChart(b_scatter_svg, data, height, width, min, max);
+
+    var inboundIntermediate = inbound.filter(function(v) {
+      return v.fuel_stop_id === null && v.intermediate_time > 0;
+    });
+
+    var outboundIntermediate = outbound.filter(function(v) {
+      return v.fuel_stop_id === null && v.intermediate_time > 0;
+    });
+
+    populateIScatterChart(i_i_scatter_svg, inboundIntermediate, (3 * height) / 4, width / 2 + 50);
+    populateIScatterChart(o_i_scatter_svg, outboundIntermediate, (3 * height) / 4, width / 2 + 50);
   });
 });

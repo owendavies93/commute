@@ -11,7 +11,7 @@ function buildScatterChart(height, width, margins, container) {
     .attr('class', 'd3-tip')
     .offset([-10, 0])
     .html(function(d) {
-      return "Date: <strong>" + dateFormatter(d.date) + "</strong><br>Start Time: <strong>" + startTimeFormatter(d.start_time) + "</strong><br>Total Time: <strong>" + timeFormatter(d.total_time) + "</strong>";
+      return "Date: <strong>" + dateFormatter(d.date) + "</strong><br>Start Time: <strong>" + startTimeFormatter(d.start_time) + "</strong><br>Total Time: <strong>" + timeFormatter(d.total_time) + "</strong><br>Int. Time: <strong>" + timeFormatter(d.intermediate_time) + "</strong>";
     });
   svg.call(tip);
 
@@ -54,6 +54,32 @@ function baseScatter(chart, ranges) {
     .attr("dy", ".71em")
     .style("text-anchor", "end")
     .text("Total Time (mins:secs)");
+}
+
+function baseIScatter(chart, ranges) {
+  var Xdiff = (ranges.maxX - ranges.minX) * 0.1;
+  var Ydiff = (ranges.maxY - ranges.minY) * 0.1;
+
+  chart.x.domain([ranges.minX - Xdiff, ranges.maxX + Xdiff]);
+  chart.y.domain([ranges.minY - Ydiff, ranges.maxY + Ydiff]);
+
+  chart.xAxis.tickValues(d3.range(ranges.minX, ranges.maxX + 150, Xdiff));
+  chart.yAxis.tickValues(d3.range(Math.floor(ranges.minY / 60) * 60, ranges.maxY, Math.round(Ydiff)));
+
+  chart.svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + ranges.height + ")")
+    .call(chart.xAxis);
+
+  chart.svg.append("g")
+    .attr("class", "y axis")
+    .call(chart.yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("Intermediate Time (mins:secs)");
 }
 
 function addTrendline (chart, xs, ys, c) {
@@ -114,6 +140,36 @@ function populateScatterChart(chart, data, height, width, min, max) {
   addTrendline(chart, startTimes, totals, "scatter");
 }
 
+function populateIScatterChart(chart, data, height, width) {
+  var startTimes = data.map(function(d) { return d.start_time });
+  var totals     = data.map(function(d) { return d.intermediate_time });
+
+  var minStart = d3.min(startTimes);
+  var maxStart = d3.max(startTimes);
+  var minTotal = d3.min(totals);
+  var maxTotal = d3.max(totals);
+
+  var ranges = {
+    height: height,
+    minX: minStart,
+    maxX: maxStart,
+    minY: minTotal,
+    maxY: maxTotal,
+  };
+  baseIScatter(chart, ranges);
+  chart.svg.selectAll(".dot")
+    .data(data)
+    .enter().append("circle")
+    .attr("class", "dot")
+    .attr("r", 2)
+    .attr("cx", function(d) { return chart.x(d.start_time); })
+    .attr("cy", function(d) { return chart.y(d.intermediate_time); })
+    .on('mouseover', chart.tip.show)
+    .on('mouseout', chart.tip.hide);
+
+  addTrendline(chart, startTimes, totals, "scatter");
+}
+
 function populateRelationChart(chart, data, height, width, min, max) {
   var startTimes = data.map(function(d) { return d.start_time });
   var totals     = data.map(function(d) { return d.total_time });
@@ -161,11 +217,12 @@ function populateRelationChart(chart, data, height, width, min, max) {
   var inboundRanges  = { min: d3.min(inboundStarts), max: d3.max(inboundStarts) };
   var outboundRanges = { min: d3.min(outboundStarts), max: d3.max(outboundStarts) };
   var inboundAverage = ss.mean(inbound.map(function(d) { return d.total_time }));
-  var eightMins      = minimiseTotal(
+
+  var eightMins = minimiseTotal(
     (8 * 60 * 60) + inboundAverage, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
-  var eightHalfMins  = minimiseTotal(
+  var eightHalfMins = minimiseTotal(
     (8.5 * 60 * 60) + inboundAverage, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
-  var nineMins  = minimiseTotal(
+  var nineMins = minimiseTotal(
     (9 * 60 * 60) + inboundAverage, inboundFunc, outboundFunc, inboundRanges, outboundRanges);
 
   chart.svg.selectAll(".resultline1")
