@@ -62,8 +62,10 @@ get '/commutes/all' => sub {
         SELECT c.id, DATE(c.end_time) AS date, c.total_time, c.mpg,
                c.start_time, c.end_time, c.direction,
                c.intermediate_timestamp, c.intermediate_time,
-               r.name, r.length, r.intermediate_length
+               r.name, r.length, r.intermediate_length,
+               f.id AS fuel_stop_id, cost AS fuel_stop_cost
         FROM commutes c JOIN routes r ON c.route_id = r.id
+        LEFT JOIN fuel_stops f ON f.commute_id = c.id
     ), { Slice => {} });
     $c->render(json => $res);
 };
